@@ -1,0 +1,117 @@
+df <- data.frame(
+  
+  y = c(82, 91, 100, 68, 87, 73, 78, 80, 65, 84, 116, 76, 97, 100, 105, 77),
+  
+  x = c(71, 64, 43, 67, 56, 73, 68, 56, 76, 65, 45, 58, 45, 53, 49, 78)
+  
+)
+
+attach(df)
+
+##Part a
+x.c = x - mean(x) # center x
+
+x.c2 = x.c^2 # record squared centered x's into x.c2
+
+#k = x.c + x.c2
+
+out = lm(y ~ x.c + x.c2)
+
+out
+
+Call:
+lm(formula = y ~ x.c + x.c2)
+
+Coefficients:
+(Intercept)          x.c         x.c2  
+   83.74561     -1.00787      0.01987  
+   
+coef = out$coefficients # record the b's into coef vector
+
+coef
+
+> coef
+(Intercept)         x.c        x.c2 
+83.74561393 -1.00787355  0.01987356
+
+x.s = sort(x) # if you want to plot the estimated curve as curve (rather than dots) sort x-values (try without sorting and see how it would look then)
+
+estim.curve = coef[1] + coef[2]*(x.s-mean(x)) + coef[3]*(x.s-mean(x))^2 # compute the regression function at the sorted x-values and recall that the coefficients were for centered data
+
+plot(x, y)
+
+points(x.s, estim.curve, type = "l", col = "red") # type is line to make it look as curve rather that points
+
+summary(out)
+
+Call:
+lm(formula = y ~ x.c + x.c2)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-10.3204  -7.4909  -0.2404   6.7939  11.9591 
+
+Coefficients:
+            Estimate Std. Error t value
+(Intercept) 83.74561    3.18325  26.308
+x.c         -1.00787    0.18862  -5.343
+x.c2         0.01987    0.01959   1.015
+            Pr(>|t|)    
+(Intercept) 1.17e-12 ***
+x.c         0.000133 ***
+x.c2        0.328757    
+---
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 8.335 on 13 degrees of freedom
+Multiple R-squared:  0.7024,	Adjusted R-squared:  0.6566 
+F-statistic: 15.34 on 2 and 13 DF,  p-value: 0.0003792
+
+##part b
+plot(fitted(out), residuals(out))
+
+##part c
+confint (out, newdata = data.frame(x=48), interval = "confidence", level = 0.95)
+
+                 2.5 %      97.5 %
+(Intercept) 76.86861671 90.62261114
+x.c         -1.41536118 -0.60038592
+x.c2        -0.02243812  0.06218524
+
+##part d
+predict(out, newdata = data.frame(x = 48),  interval = "predict", level =0.95)
+
+##part e
+anova(out)
+
+Analysis of Variance Table
+
+Response: y
+          Df  Sum Sq Mean Sq F value    Pr(>F)
+x.c        1 2059.78 2059.78 29.6494 0.0001121
+x.c2       1   71.53   71.53  1.0296 0.3287566
+Residuals 13  903.13   69.47                  
+             
+x.c       ***
+x.c2         
+Residuals    
+---
+Signif. codes:  
+0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+Fstat = 15.34
+
+Fstat
+
+qf(0.95, df1 = 1, df2 = 13) 
+
+pf(Fstat, df1 = 1, df2 = 13, lower.tail = F)
+
+> Fstat
+[1] 15.34
+> 
+> qf(0.95, df1 = 1, df2 = 13) 
+[1] 4.667193
+> 
+> pf(Fstat, df1 = 1, df2 = 13, lower.tail = F)
+[1] 0.001769634
